@@ -1,5 +1,6 @@
 export class ClientPlayer {
-    constructor ({xPos, yPos, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, projectileSpeed, fireRateDelay, canvas}) {
+    constructor ({playerID, xPos, yPos, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, projectileSpeed, fireRateDelay, canvas}) {
+        this.playerID = playerID
         this.xPos = xPos
         this.yPos = yPos
         this.radius = radius

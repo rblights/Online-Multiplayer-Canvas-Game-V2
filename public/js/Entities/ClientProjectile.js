@@ -1,5 +1,6 @@
 export class ClientProjectile {
-    constructor({x, y, radius, color, velocity, projectileSpeed, canvas}) {
+    constructor({playerID, x, y, radius, color, velocity, projectileSpeed, canvas}) {
+        this.playerID = playerID
         this.x = x
         this.y = y
         this.radius = radius
