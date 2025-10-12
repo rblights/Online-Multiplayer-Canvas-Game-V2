@@ -6,7 +6,7 @@ import { StarManager } from "./Managers/StarManager.js"
 import { GameLoop } from "./GameLoop.js"
 
 export class GameClient {
-    constructor(socket) {
+    constructor(socket = null) {
         this.socket = socket
         this.canvas = null
 
@@ -20,15 +20,18 @@ export class GameClient {
 
         this.gameLoop = null
 
-        this._setupNetworkListeners()
+        if (this.socket) {
+            this._setupNetworkListeners()
+        }
+        
     }
 
     _setupNetworkListeners() {
-        this.socket.on('gameStart', (gameData) => this.startGame(gameData))
+        this.socket.on('gameStart', (gameData) => this._startOnlineGame(gameData))
     }
 
-    startGame(gameData) {
-        console.log("Full gameData recieved: ", gameData)
+    _startOnlineGame(gameData) {
+        console.log("Full gameData recieved (Online): ", gameData)
         this.canvas = new Canvas(gameData.canvas.width, gameData.canvas.height)
 
         const ourID = gameData.playerID
@@ -42,12 +45,34 @@ export class GameClient {
             }
         });
 
-        this.inputManager = new InputManager(
-            this.localPlayer,
-            this.projectileManager,
-            this.canvas
-        )
-        this.inputManager.attachListeners()
+        this._initManagersAndLoop()
+        this.gameLoop.start()
+        
+
+        console.log('Online game started. Local Player: ', this.localPlayer, 'Remote Player: ', this.remotePlayer)
+    }
+
+    startSinglePlayerGame(options = {}) {
+        //const {width = 1280, height = 720} = options
+        //console.log('Starting single player game...')
+
+        
+
+        ///
+        //this._initManagersAndLoop()
+        //this.gameLoop.start()
+    }
+
+    _initManagersAndLoop() {
+        if (this.localPlayer) {
+            this.inputManager = new InputManager(
+                this.localPlayer,
+                this.projectileManager,
+                this.canvas,
+                this.socket
+            )
+            this.inputManager.attachListeners()
+        }
 
         this.gameLoop = new GameLoop(
             this.canvas,
@@ -55,12 +80,6 @@ export class GameClient {
             this.remotePlayer,
             this.projectileManager,
             this.starManager,
-            gameData.canvas.width,
-            gameData.canvas.height
         )
-        this.gameLoop.start()
-
-        console.log('Local Player: ', this.localPlayer)
-        console.log('Remote Player: ', this.remotePlayer)
     }
 }

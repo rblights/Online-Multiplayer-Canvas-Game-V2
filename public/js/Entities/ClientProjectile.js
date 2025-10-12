@@ -27,6 +27,8 @@ export class ClientProjectile {
 
         this.alpha -= .002
 
+        console.log(this.canvas.canvas.width)
+
         if (this.x < 0 - this.radius) {
             this.x = this.canvas.canvas.width + this.radius
         } else if (this.x > this.canvas.canvas.width + this.radius) {

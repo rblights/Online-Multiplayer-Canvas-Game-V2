@@ -16,6 +16,7 @@ export class GameLoop {
 
     start() {
         this._animate()
+        console.log(this.canvas.canvas.width)
     }
 
     _update() {
@@ -27,12 +28,12 @@ export class GameLoop {
     }
 
     _render() {
-        console.log(this.canvas.context)
         this.canvas.context.fillStyle = 'rgba(0, 0, 0, .2)'
         this.canvas.context.fillRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height)
 
         this.starManager.render(this.canvas.context)
         this.projectileManager.render(this.canvas.context)
+
 
         if (this.localPlayer) this.localPlayer.draw()
         if (this.remotePlayer) this.remotePlayer.draw()
@@ -42,9 +43,7 @@ export class GameLoop {
         requestAnimationFrame(this._animate)
         this.frameCount++
 
-        if (this.frameCount % this.FPS === 0) {
-            this.starManager.spawnStars(this.canvas)
-        }
+        this.starManager.spawnStars(this.canvas, 100)
 
         this._update()
         this._render()

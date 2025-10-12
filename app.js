@@ -8,7 +8,7 @@ const { initSocketEvents } = require('./server/js/socketHandler')
 
 const app = express()
 const server = http.createServer(app)
-const io = new Server(server)
+const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000})
 
 const gameManager = new GameManager()
 

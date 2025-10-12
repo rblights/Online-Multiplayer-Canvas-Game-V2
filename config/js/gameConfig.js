@@ -8,7 +8,9 @@ const PLAYERS_PER_GAME = 2
 
 const PLAYER_COLORS = {
     localColor: 'blue',
-    remoteColor: 'red'
+    remoteColor: 'red',
+    shipBackColor: 'white',
+    projectileReadyColor: 'lightGreen'
 }
 
 const BASE_PLAYER_STATS = {
@@ -28,6 +30,7 @@ module.exports = {
     PORT,
     CANVAS,
     BACKGROUND_COLOR,
+    FPS,
     PLAYERS_PER_GAME,
     PLAYER_COLORS,
     BASE_PLAYER_STATS
