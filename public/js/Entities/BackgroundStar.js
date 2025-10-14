@@ -1,27 +1,19 @@
-export class Stars {
+export class BackgroundStar {
     constructor(canvas) {
         this.canvas = canvas
-        this.x = Math.random() * (canvas.canvas.width + 13)
+        this.reset(canvas)
+        
+    }
+
+    reset(canvas) {
+        this.x = Math.random() * (canvas.canvas.width + 130)
         this.y = Math.random() * canvas.canvas.height
-        this.radius = Math.random() * 1 + 2
+        this.radius = Math.random() * 1 + 1
         this.glowRadius = this.radius * 3
         this.color = `hsl(${Math.random() * 360}, 35%, 50%)`
         this.alpha = 0
         this.fadeSpeed = Math.random() * .01
         this.peakAlpha = Math.random() * .5 + .5
-        this.fadingIn = true
-    }
-
-    reset(canvas) {
-        //this.canvas = canvas
-        this.x = Math.random() * canvas.canvas.width
-        //this.y = Math.random() * canvas.canvas.height
-        this.radius = Math.random() * 1 + 2
-        this.glowRadius = this.radius * 3
-        //this.color = `hsl(${Math.random() * 360}, 35%, 50%)`
-        this.alpha = 0
-        //this.fadeSpeed = Math.random() * .01 
-        //this.peakAlpha = Math.random() * .5 + .5
         this.fadingIn = true
 
     }
@@ -45,20 +37,20 @@ export class Stars {
     }
 
     update() {
-        this.x = this.x - this.radius / 10
+        this.x -= this.radius / 10
 
         if (this.fadingIn) {
             this.alpha += this.fadeSpeed 
-            this.radius += this.fadeSpeed 
-            this.glowRadius += this.fadeSpeed 
+            //this.radius += this.fadeSpeed 
+            //this.glowRadius += this.fadeSpeed 
 
             if (this.alpha >= this.peakAlpha) {
                 this.fadingIn = false
             }
         } else {
-            this.alpha -= this.fadeSpeed 
-            this.radius -= this.fadeSpeed  
-            this.glowRadius -= this.fadeSpeed 
+            this.alpha -= this.fadeSpeed / this.radius
+            //this.radius -= this.fadeSpeed / this.radius
+            //this.glowRadius -= this.fadeSpeed / this.radius
         }
 
 

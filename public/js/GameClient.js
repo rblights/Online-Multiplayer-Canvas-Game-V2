@@ -2,35 +2,36 @@ import { Canvas } from "./Entities/Canvas.js"
 import { ClientPlayer } from "./Entities/ClientPlayer.js"
 import { InputManager } from "./Managers/InputManager.js"
 import { ProjectileManager } from "./Managers/ProjectileManager.js"
-import { StarManager } from "./Managers/StarManager.js"
+import { BackgroundStarManager } from "./Managers/BackgroundStarManager.js"
+import { ForegroundStarManager } from "./Managers/ForegroundStarManager.js"
 import { GameLoop } from "./GameLoop.js"
+import { NetworkManager } from "./Managers/NetworkManager.js"
 
 export class GameClient {
-    constructor(socket = null) {
-        this.socket = socket
+    constructor(socket = null, networkManager = null) {
         this.canvas = null
 
         this.localPlayer = null
         this.remotePlayer = null
 
         this.projectileManager = new ProjectileManager()
-        this.starManager = new StarManager()
+        this.backgroundStarManager = new BackgroundStarManager()
+        this.foregroundStarManager = new ForegroundStarManager()
 
         this.inputManager = null
 
         this.gameLoop = null
 
-        if (this.socket) {
-            this._setupNetworkListeners()
+        this.socket = socket
+        this.networkManager = new NetworkManager(this.socket)
+
+        if (this.networkManager) {
+            this.networkManager.setupNetworkListeners(this)
         }
         
     }
 
-    _setupNetworkListeners() {
-        this.socket.on('gameStart', (gameData) => this._startOnlineGame(gameData))
-    }
-
-    _startOnlineGame(gameData) {
+    startOnlineGame(gameData) {
         console.log("Full gameData recieved (Online): ", gameData)
         this.canvas = new Canvas(gameData.canvas.width, gameData.canvas.height)
 
@@ -79,7 +80,9 @@ export class GameClient {
             this.localPlayer,
             this.remotePlayer,
             this.projectileManager,
-            this.starManager,
+            this.backgroundStarManager,
+            this.foregroundStarManager
         )
+        this.foregroundStarManager.initializeForegroundStars(this.canvas)
     }
 }

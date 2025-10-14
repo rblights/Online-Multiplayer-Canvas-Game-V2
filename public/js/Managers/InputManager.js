@@ -1,10 +1,11 @@
 import { ClientProjectile } from "../Entities/ClientProjectile.js"
 
 export class InputManager {
-    constructor(localPlayer, projectileManager, canvas) {
+    constructor(localPlayer, projectileManager, canvas, networkManager = null) {
         this.localPlayer = localPlayer
         this.projectileManager = projectileManager
         this.canvas = canvas
+        this.networkManager = networkManager
 
         this._handleKeyDown = this._handleKeyDown.bind(this)
         this._handleKeyUp = this._handleKeyUp.bind(this)

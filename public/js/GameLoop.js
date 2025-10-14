@@ -1,12 +1,15 @@
 export class GameLoop {
-    constructor(canvas, localPlayer, remotePlayer, projectileManager, starManager) {
-        this.canvas = canvas,
+    constructor(canvas, localPlayer, remotePlayer, projectileManager, backgroundStarManager, foregroundStarManager) {
+        this.canvas = canvas
 
-        this.localPlayer = localPlayer,
-        this.remotePlayer = remotePlayer,
+        this.localPlayer = localPlayer
+        this.remotePlayer = remotePlayer
 
-        this.projectileManager = projectileManager,
-        this.starManager = starManager,
+        this.projectileManager = projectileManager
+
+        this.backgroundStarManager = backgroundStarManager
+        this.foregroundStarManager = foregroundStarManager
+
 
         this.frameCount = 0
         this.FPS = 60
@@ -20,7 +23,8 @@ export class GameLoop {
     }
 
     _update() {
-        this.starManager.update()
+        this.backgroundStarManager.update()
+        this.foregroundStarManager.update()
         this.projectileManager.update()
         if (this.localPlayer) this.localPlayer.update()
 
@@ -31,7 +35,8 @@ export class GameLoop {
         this.canvas.context.fillStyle = 'rgba(0, 0, 0, .2)'
         this.canvas.context.fillRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height)
 
-        this.starManager.render(this.canvas.context)
+        this.backgroundStarManager.render(this.canvas.context)
+        this.foregroundStarManager.render(this.canvas.context)
         this.projectileManager.render(this.canvas.context)
 
 
@@ -43,7 +48,11 @@ export class GameLoop {
         requestAnimationFrame(this._animate)
         this.frameCount++
 
-        this.starManager.spawnStars(this.canvas, 100)
+        this.backgroundStarManager.spawnBackgroundStars(this.canvas, 100)
+        
+        if (Math.random() < 0.1) { 
+        this.foregroundStarManager.spawnForegroundStar(this.canvas, this.canvas.canvas.width + 100, 1)
+        }
 
         this._update()
         this._render()
