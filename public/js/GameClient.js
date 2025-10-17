@@ -40,9 +40,9 @@ export class GameClient {
             const playerState = {...initPlayerState, canvas:this.canvas}
 
             if (initPlayerState.playerID === ourID) {
-                this.localPlayer = new ClientPlayer({...playerState, color: 'blue'})
+                this.localPlayer = new ClientPlayer({...playerState, gameID: gameData.gameID, color: 'blue'})
             } else {
-                this.remotePlayer = new ClientPlayer({...playerState, color: 'red'})
+                this.remotePlayer = new ClientPlayer({...playerState, gameID: gameData.gameID, color: 'red'})
             }
         });
 
@@ -66,11 +66,12 @@ export class GameClient {
 
     _initManagersAndLoop() {
         if (this.localPlayer) {
+            console.log('NetworkManager instance before passing to InputManager:', this.networkManager);
             this.inputManager = new InputManager(
                 this.localPlayer,
                 this.projectileManager,
                 this.canvas,
-                this.socket
+                this.networkManager
             )
             this.inputManager.attachListeners()
         }
@@ -84,5 +85,15 @@ export class GameClient {
             this.foregroundStarManager
         )
         this.foregroundStarManager.initializeForegroundStars(this.canvas)
+    }
+
+    handlePlayerStateUpdate(playerStates) {
+        playerStates.forEach(serverPlayerState => {
+            if (this.localPlayer && serverPlayerState.playerID === this.localPlayer.playerID) {
+                this.localPlayer.syncState(serverPlayerState)
+            } else if (this.remotePlayer && serverPlayerState.playerID === this.remotePlayer.playerID) {
+                this.remotePlayer.syncState(serverPlayerState)
+            }
+        })
     }
 }

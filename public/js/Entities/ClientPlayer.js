@@ -1,14 +1,15 @@
 export class ClientPlayer {
-    constructor ({playerID, xPos, yPos, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, projectileSpeed, fireRateDelay, canvas}) {
+    constructor ({gameID = null, playerID, xPos, yPos, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, projectileSpeed, fireRateDelay, canvas}) {
+        this.gameID = gameID
         this.playerID = playerID
         this.xPos = xPos
         this.yPos = yPos
         this.radius = radius
         this.color = color
         this.thrusterColor = thrusterColor
-        this.angle = angle / 180 * Math.PI
+        this.angle = angle
         this.rotation = 0
-        this.turnSpeed = turnSpeed / 180 * Math.PI
+        this.turnSpeed = turnSpeed 
         this.velocity = { x: 0, y: 0 }
         this.acceleration = acceleration
         this.maxSpeed = maxSpeed
@@ -27,8 +28,17 @@ export class ClientPlayer {
         this.canvas = canvas
     }
 
+    syncState(newState) {
+        if (newState.xPos !== undefined) this.xPos = newState.xPos
+        if (newState.yPos !== undefined) this.yPos = newState.yPos
+        if (newState.angle !== undefined) this.angle = newState.angle
+        if (newState.rotation !== undefined) this.rotation = newState.rotation
+        if (newState.velocity !== undefined) this.velocity = newState.velocity
+        if (newState.acceleration !== undefined) this.acceleration = newState.acceleration
+    }
+
     draw() {
-        this.canvas.context.lineWidth = 2
+        this.canvas.context.lineWidth = 5
 
         const POINT1_X = this.xPos + 4 / 3 * this.radius * Math.cos(this.angle)
         const POINT1_Y = this.yPos - 4 / 3 * this.radius * Math.sin(this.angle)
@@ -77,6 +87,14 @@ export class ClientPlayer {
             this.velocity.y *= this.velocityDampening
         }
 
+        if (this.isTurningLeft) {
+            this.rotation = this.turnSpeed / 60
+        } else if (this.isTurningRight) {
+            this.rotation = -this.turnSpeed / 60
+        } else {
+            this.rotation = 0
+        }
+
         this.xPos += this.velocity.x
         this.yPos += this.velocity.y
 
@@ -98,4 +116,6 @@ export class ClientPlayer {
             this.thrusterColor = 'white'
         }
     }
+
+    
 }

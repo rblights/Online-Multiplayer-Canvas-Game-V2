@@ -4,30 +4,34 @@ export class NetworkManager {
             throw new Error("NetworkManager requires a socket instance")
         }
         this.socket = socket
-        console.log('NetworkManager init with socket: ', socket.id)
     }
 
     setupNetworkListeners(gameClient) {
         this.socket.on('gameStart', (gameData) => {
+            console.log(this.socket)
+            console.log('NetworkManager init with socket: ', this.socket.id)
             console.log("NetworkManager recieved 'gameStart'. GameClient init")
 
             gameClient.startOnlineGame(gameData)
         })
 
-        this.socket.on('playerUpdate', (playerState) => {
-            // gameClient.updateRemotePlayer(playerState);
-            // console.log("Received player update:", playerState); // For debugging
-        });
+        this.socket.on('playerStateUpdate', (playerStates) => {
+
+            // console.log("Received player update:", playerStates)
+
+            gameClient.handlePlayerStateUpdate(playerStates)
+        })
 
         this.socket.on('projectileFired', (projectileData) => {
             // gameClient.addRemoteProjectile(projectileData);
             // console.log("Received projectile fired:", projectileData); // For debugging
-        });
+        })
         
     }
 
-    sendPlayerInput(inputData) {
-        this.socket.emit('playerInput', inputData);
+    sendPlayerInput(inputData, gameID, playerID) {
+        this.socket.emit('playerInput', inputData, gameID, playerID);
+        //console.log(inputData, gameID)
     }
 
     sendProjectileFire(projectileData) {
