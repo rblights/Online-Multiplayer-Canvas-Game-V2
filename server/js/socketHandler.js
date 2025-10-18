@@ -1,16 +1,27 @@
-const { CANVAS } = require('../../config/js/gameConfig')
+const { CANVAS } = require('../../config/js/gameConfig.js')
+const { EventEmitter } = require('../../utils/js/EventEmitter.js')
+const { ServerInputManager } = require('./ServerInputManager.js')
 
 function initSocketEvents(io, gameManager) {
 
     gameManager.on('playerStateUpdate', (gameID, playerStates) => {
             io.to(gameID).emit('playerStateUpdate', playerStates)
             playerStates.map(p => p.id)
-            console.log(playerStates)
+            // console.log(playerStates)
     })
     
     io.on('connection', (socket) => {
-
         console.log(`A user connected: ${socket.id}`)
+
+        const playerInputEmitter = new EventEmitter()
+        new ServerInputManager(playerInputEmitter, gameManager, socket.id)
+        socket.on('playerInput', (keycode, gameID, playerID) => {
+            playerInputEmitter.emit('playerInput', { keycode, gameID, playerID, sourceID: socket.id })
+        })
+        socket.on('disconnect', (reason) => {
+            playerInputEmitter.emit('disconnect', {reason, sourceID: socket.id})
+        })
+        
 
         gameManager.addPlayerToQueue(socket)
 
@@ -48,50 +59,6 @@ function initSocketEvents(io, gameManager) {
 
             // player leaves active game
         })
-
-        // other game events
-
-        socket.on('playerInput', (keycode, gameID, playerID) => {
-
-            switch (keycode) {
-                case 'KeyW':
-                    gameManager.activeGames[gameID].players[playerID].isAccelerating = true
-                    // console.log(gameManager.activeGames[gameID].players[playerID])
-                    break
-                case 'KeyA':
-                    gameManager.activeGames[gameID].players[playerID].isTurningLeft = true
-                    break
-                case 'KeyS':
-                    gameManager.activeGames[gameID].players[playerID].isBraking = true
-                    break
-                case 'KeyD':
-                    gameManager.activeGames[gameID].players[playerID].isTurningRight = true
-                    break
-
-                case 'Space':
-                    
-                    break
-            }
-        
-
-
-            switch (keycode) {
-                case 'KeyWUp':
-                    gameManager.activeGames[gameID].players[playerID].isAccelerating = false
-                    break
-                case 'KeyAUp':
-                    gameManager.activeGames[gameID].players[playerID].isTurningLeft = false
-                    break
-                case 'KeySUp':
-                    gameManager.activeGames[gameID].players[playerID].isBraking = false
-                    break
-                case 'KeyDUp':
-                    gameManager.activeGames[gameID].players[playerID].isTurningRight = false
-                    break
-            }
-            
-        })
-
     })
 }
 
