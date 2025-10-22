@@ -4,7 +4,7 @@ export class ForegroundStarManager {
     constructor() {
         this.foregroundStars = []
         this.recycledForegroundStars = []
-        this.maxForegroundStars = 250
+        this.maxForegroundStars = 240
     }
 
     initializeForegroundStars(canvas, count = 100) {

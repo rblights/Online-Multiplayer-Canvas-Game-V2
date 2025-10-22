@@ -15,6 +15,28 @@ export class InputManager {
 
         this._handleKeyDown = this._handleKeyDown.bind(this)
         this._handleKeyUp = this._handleKeyUp.bind(this)
+
+        this.playerInputs = []
+
+        this.keys = {
+            
+            w: {
+                pressed: false
+            },
+            a: {
+                pressed: false
+            },
+            s: {
+                pressed: false
+            },
+            d: {
+                pressed: false
+            },
+            space: {
+                pressed: false
+            }
+    
+        }
     }
 
     attachListeners() {
@@ -25,40 +47,63 @@ export class InputManager {
         window.addEventListener('keyup', this._handleKeyUp)
     }
 
+    startInputLoop() {
+        let sequenceNumber = this.localPlayer.lastProcessedInputSequence > 0 ?
+                            this.localPlayer.lastProcessedInputSequence[this.localPlayer.lastProcessedInputSequence - 1].sequenceNumber + 1 : 0
+
+        setInterval(() => {
+            const currentInputs = {
+                sequenceNumber: sequenceNumber++,
+                keyW: this.keys.w.pressed,
+                keyA: this.keys.a.pressed,
+                keyS: this.keys.s.pressed,
+                keyD: this.keys.d.pressed,
+                keySpace: this.keys.space.pressed
+            }
+            this.localPlayer.lastProcessedInputSequence.push(currentInputs)
+            this.networkManager.sendPlayerInput(
+                currentInputs,
+                this.localPlayer.gameID,
+                this.localPlayer.playerID
+            )
+        }, 1000 / 60);
+
+    }
+
+    applyInputToPLayer(player, inputState, isPrediction = false) {
+        player.isAccelerating = inputState.keyW
+        player.isTurningLeft = inputState.keyA
+        player.isBraking = inputState.keySpace
+        player.isTurningRight = inputState.keyD
+
+        if (isPrediction && inputState.keySpace) {
+            this.projectileManager.tryFireProjectile(player, this.canvas)
+        }
+    }
+
+    
+
     _handleKeyDown(keyDown) {
         if (!this.localPlayer) return
 
         switch (keyDown.code) {
-            case 'KeyW':
-                
-                this.localPlayer.isAccelerating = true
-                /*console.log('Attempting to call sendPlayerInput. NetworkManager:', this.networkManager);
-                if (this.networkManager) {
-                    console.log('Is sendPlayerInput a function here?', typeof this.networkManager.sendPlayerInput === 'function');
-                    this.networkManager.sendPlayerInput('KeyW', this.localPlayer.gameID);
-                } else {
-                    console.error('Cannot call sendPlayerInput: networkManager is null!');
-                }*/
-                this.networkManager.sendPlayerInput('KeyW', this.localPlayer.gameID, this.localPlayer.playerID)
-                //console.log(this.networkManager, this.localPlayer.gameID)
+            case 'KeyW':           
+                this.keys.w.pressed = true
                 break
             case 'KeyA':
-                this.localPlayer.isTurningLeft = true
-                this.networkManager.sendPlayerInput('KeyA', this.localPlayer.gameID, this.localPlayer.playerID)
+                this.keys.a.pressed = true
                 break
             case 'KeyS':
-                this.localPlayer.isBraking = true
-                this.networkManager.sendPlayerInput('KeyS', this.localPlayer.gameID, this.localPlayer.playerID)
+                this.keys.s.pressed = true
                 break
             case 'KeyD':
-                this.localPlayer.isTurningRight = true
-                this.networkManager.sendPlayerInput('KeyD', this.localPlayer.gameID, this.localPlayer.playerID)
+                this.keys.d.pressed = true
                 break
-
             case 'Space':
-                this.projectileManager.tryFireProjectile(this.localPlayer, this.canvas)
+                this.keys.space.pressed = true
                 break
         }
+        this.applyInputToPLayer(this.localPlayer, this.keys, true)
     }
 
     _handleKeyUp(keyUp) {
@@ -66,23 +111,33 @@ export class InputManager {
 
         switch (keyUp.code) {
             case 'KeyW':
-                this.localPlayer.isAccelerating = false
-                this.networkManager.sendPlayerInput('KeyWUp', this.localPlayer.gameID, this.localPlayer.playerID)
+                this.keys.w.pressed = false
+                // this.localPlayer.isAccelerating = false
+                // this.networkManager.sendPlayerInput('KeyWUp', this.localPlayer.gameID, this.localPlayer.playerID)
                 break
             case 'KeyA':
-                this.localPlayer.isTurningLeft = false
-                this.networkManager.sendPlayerInput('KeyAUp', this.localPlayer.gameID, this.localPlayer.playerID)
+                this.keys.a.pressed = false
+                // this.localPlayer.isTurningLeft = false
+                // this.networkManager.sendPlayerInput('KeyAUp', this.localPlayer.gameID, this.localPlayer.playerID)
                 break
             case 'KeyS':
-                this.localPlayer.isBraking = false
-                this.networkManager.sendPlayerInput('KeySUp', this.localPlayer.gameID, this.localPlayer.playerID)
+                this.keys.s.pressed = false
+                // this.localPlayer.isBraking = false
+                // this.networkManager.sendPlayerInput('KeySUp', this.localPlayer.gameID, this.localPlayer.playerID)
                 break
             case 'KeyD':
-                this.localPlayer.isTurningRight = false
-                this.networkManager.sendPlayerInput('KeyDUp', this.localPlayer.gameID, this.localPlayer.playerID)
+                this.keys.d.pressed = false
+                // this.localPlayer.isTurningRight = false
+                // this.networkManager.sendPlayerInput('KeyDUp', this.localPlayer.gameID, this.localPlayer.playerID)
+                break
+            case 'Space':
+                this.keys.space.pressed = false
                 break
         }
+        this.applyInputToPLayer(this.localPlayer, this.keys, true)
     }
+
+
 
 
 }

@@ -25,6 +25,8 @@ export class ClientPlayer {
         this.lastFireTime = 0
         this.fireRateDelay = 500
 
+        this.lastProcessedInputSequence = []
+
         this.canvas = canvas
     }
 
@@ -35,6 +37,8 @@ export class ClientPlayer {
         if (newState.rotation !== undefined) this.rotation = newState.rotation
         if (newState.velocity !== undefined) this.velocity = newState.velocity
         if (newState.acceleration !== undefined) this.acceleration = newState.acceleration
+
+        if (newState.lastProcessedInputSequence !== undefined) this.lastProcessedInputSequence = newState.lastProcessedInputSequence
     }
 
     draw() {

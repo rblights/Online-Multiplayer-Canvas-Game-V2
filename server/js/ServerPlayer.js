@@ -27,6 +27,24 @@ class ServerPlayer {
         this.projectileSpeed = projectileSpeed
         this.lastFireTime = 0
         this.fireRateDelay = 500
+        this.wasSpacePressedLastTick = false
+
+        this.lastProcessedInputSequence = []
+    }
+
+    getState() {
+        return {
+            playerID: this.playerID,
+            xPos: this.xPos,
+            yPos: this.yPos,
+            angle: this.angle, 
+            velocity: { ...this.velocity }, 
+            color: this.color,
+            thrusterColor: this.thrusterColor, 
+            // health: this.health,
+            // isAlive: this.isAlive,
+            lastProcessedInputSequence: this.lastProcessedInputSequence
+        }
     }
 
     update() {
@@ -81,19 +99,7 @@ class ServerPlayer {
         }
     }
 
-    getState() {
-        return {
-            playerID: this.playerID,
-            xPos: this.xPos,
-            yPos: this.yPos,
-            angle: this.angle, 
-            velocity: { ...this.velocity }, 
-            color: this.color,
-            thrusterColor: this.thrusterColor, 
-            // health: this.health,
-            // isAlive: this.isAlive
-        }
-    }
+    
 }
 
 module.exports = { ServerPlayer }

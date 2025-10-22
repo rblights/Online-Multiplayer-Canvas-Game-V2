@@ -74,6 +74,7 @@ export class GameClient {
                 this.networkManager
             )
             this.inputManager.attachListeners()
+            this.inputManager.startInputLoop()
         }
 
         this.gameLoop = new GameLoop(
@@ -91,6 +92,20 @@ export class GameClient {
         playerStates.forEach(serverPlayerState => {
             if (this.localPlayer && serverPlayerState.playerID === this.localPlayer.playerID) {
                 this.localPlayer.syncState(serverPlayerState)
+                // console.log(this.localPlayer.lastProcessedInputSequence)
+                const lastServerProcessedSequenceNumber = serverPlayerState.lastProcessedInputSequence
+                const lastServerPlayerInputIndex = this.localPlayer.lastProcessedInputSequence.findIndex(input => {
+                    return input.sequenceNumber === lastServerProcessedSequenceNumber
+                })
+                if (lastServerPlayerInputIndex !== -1) {
+                    this.localPlayer.lastProcessedInputSequence.splice(0, lastServerPlayerInputIndex + 1)
+                }
+                this.localPlayer.lastProcessedInputSequence.forEach(input => {
+                    // console.log(input)
+                    this.inputManager.applyInputToPLayer(this.localPlayer, input, false)
+                    this.localPlayer.update(1000 / 60)
+                })
+                
             } else if (this.remotePlayer && serverPlayerState.playerID === this.remotePlayer.playerID) {
                 this.remotePlayer.syncState(serverPlayerState)
             }

@@ -5,7 +5,7 @@ export class ForegroundStar {
     }
 
     reset(canvas, x = null) {
-        this.radius = Math.random() * 9 + 1
+        this.radius = Math.random() * 4 + 1
         this.glowRadius = this.radius * 3
         
         this.x = x !== null ? x : canvas.canvas.width + 130

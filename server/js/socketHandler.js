@@ -15,8 +15,8 @@ function initSocketEvents(io, gameManager) {
 
         const playerInputEmitter = new EventEmitter()
         new ServerInputManager(playerInputEmitter, gameManager, socket.id)
-        socket.on('playerInput', (keycode, gameID, playerID) => {
-            playerInputEmitter.emit('playerInput', { keycode, gameID, playerID, sourceID: socket.id })
+        socket.on('playerInput', (currentInputs, gameID, playerID) => {
+            playerInputEmitter.emit('playerInput', { currentInputs, gameID, playerID, sourceID: socket.id })
         })
         socket.on('disconnect', (reason) => {
             playerInputEmitter.emit('disconnect', {reason, sourceID: socket.id})

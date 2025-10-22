@@ -19,14 +19,16 @@ export class GameLoop {
 
     start() {
         this._animate()
-        console.log(this.canvas.canvas.width)
+        // console.log(this.canvas.canvas.width)
     }
 
     _update() {
         this.backgroundStarManager.update()
         this.foregroundStarManager.update()
         this.projectileManager.update()
+
         if (this.localPlayer) this.localPlayer.update()
+            if (this.remotePlayer) this.remotePlayer.update()
 
         
     }

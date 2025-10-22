@@ -4,7 +4,7 @@ export class BackgroundStarManager {
     constructor() {
         this.backgroundStars = []
         this.recycledBackgroundStars = []
-        this.maxBackgroundStars = 250
+        this.maxBackgroundStars = 240
     }
 
     spawnBackgroundStar(canvas) {
