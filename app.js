@@ -2,9 +2,9 @@ const express = require('express')
 const http = require('http')
 const { Server } = require('socket.io')
 
-const { PORT } = require('./config/js/gameConfig')
-const GameManager = require('./server/js/GameManager')
-const { initSocketEvents } = require('./server/js/socketHandler')
+const { PORT } = require('./config/js/gameConfig.js')
+const GameManager = require('./server/js/Server Managers/GameManager.js')
+const { initSocketEvents } = require('./server/js/socketHandler.js')
 
 const app = express()
 const server = http.createServer(app)

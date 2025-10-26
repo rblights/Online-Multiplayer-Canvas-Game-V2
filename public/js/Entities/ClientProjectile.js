@@ -1,6 +1,8 @@
 export class ClientProjectile {
-    constructor({playerID, x, y, radius, color, velocity, projectileSpeed, canvas}) {
+    constructor({gameID = null, playerID, projectileID, x, y, radius, color, velocity, projectileSpeed, canvas}) {
+        this.gameID = gameID
         this.playerID = playerID
+        this.projectileID = projectileID
         this.x = x
         this.y = y
         this.radius = radius
@@ -11,6 +13,16 @@ export class ClientProjectile {
         this.alpha = 1
 
     }
+
+    syncState(newState) {
+        if (newState.x !== undefined) this.x = newState.x
+        if (newState.y !== undefined) this.y = newState.y
+        if (newState.radius !== undefined) this.radius = newState.radius
+        if (newState.velocity !== undefined) this.velocity = newState.velocity
+        if (newState.projectileSpeed !== undefined) this.projectileSpeed = newState.projectileSpeed
+        if (newState.alpha !== undefined) this.alpha = newState.alpha
+    }
+
     draw() {
         this.canvas.context.save()
         this.canvas.context.globalAlpha = this.alpha
@@ -27,7 +39,7 @@ export class ClientProjectile {
 
         this.alpha -= .002
 
-        console.log(this.canvas.canvas.width)
+        // console.log(this.canvas.canvas.width)
 
         if (this.x < 0 - this.radius) {
             this.x = this.canvas.canvas.width + this.radius

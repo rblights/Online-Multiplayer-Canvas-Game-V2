@@ -1,6 +1,6 @@
 const { CANVAS } = require('../../config/js/gameConfig.js')
 const { EventEmitter } = require('../../utils/js/EventEmitter.js')
-const { ServerInputManager } = require('./ServerInputManager.js')
+const { ServerInputManager } = require('./Server Managers/ServerInputManager.js')
 
 function initSocketEvents(io, gameManager) {
 
@@ -9,14 +9,19 @@ function initSocketEvents(io, gameManager) {
             playerStates.map(p => p.id)
             // console.log(playerStates)
     })
+
+    gameManager.on('projectileStateUpdate', (gameID, projectileStates) => {
+        io.to(gameID).emit('projectileStateUpdate', projectileStates)
+    })
     
     io.on('connection', (socket) => {
         console.log(`A user connected: ${socket.id}`)
 
         const playerInputEmitter = new EventEmitter()
         new ServerInputManager(playerInputEmitter, gameManager, socket.id)
-        socket.on('playerInput', (currentInputs, gameID, playerID) => {
-            playerInputEmitter.emit('playerInput', { currentInputs, gameID, playerID, sourceID: socket.id })
+
+        socket.on('playerInput', (currentInputs, currentPlayer) => {
+            playerInputEmitter.emit('playerInput', { currentInputs, currentPlayer })
         })
         socket.on('disconnect', (reason) => {
             playerInputEmitter.emit('disconnect', {reason, sourceID: socket.id})
@@ -32,6 +37,9 @@ function initSocketEvents(io, gameManager) {
 
             player1.socket.join(gameID)
             player2.socket.join(gameID)
+
+            player1.socket.gameID = gameID
+            player2.socket.gameID = gameID
 
             player1.socket.emit('gameStart', {
                 gameID: gameID,
@@ -57,7 +65,11 @@ function initSocketEvents(io, gameManager) {
                 console.log(`Removed ${socket.id} from queue. Players in queue: ${gameManager.playerQueue.length}`)
             }
 
-            // player leaves active game
+            const disconnectedGameID = socket.gameID; 
+
+            if (disconnectedGameID && gameManager.endGame(disconnectedGameID)) {
+                console.log(`Removed ${socket.id} and ended game ${disconnectedGameID}.`)
+            }
         })
     })
 }

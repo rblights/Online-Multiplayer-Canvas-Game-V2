@@ -6,11 +6,11 @@ export class InputManager {
         this.projectileManager = projectileManager
         this.canvas = canvas
         this.networkManager = networkManager
-        console.log('NetworkManager inside InputManager:', this.networkManager);
+        // console.log('NetworkManager inside InputManager:', this.networkManager);
         if (this.networkManager) {
-            console.log('Does InputManager.networkManager have sendPlayerInput?', typeof this.networkManager.sendPlayerInput === 'function');
+            // console.log('Does InputManager.networkManager have sendPlayerInput?', typeof this.networkManager.sendPlayerInput === 'function');
         } else {
-            console.log('InputManager.networkManager is null or undefined!');
+            // console.log('InputManager.networkManager is null or undefined!');
         }
 
         this._handleKeyDown = this._handleKeyDown.bind(this)
@@ -45,11 +45,12 @@ export class InputManager {
 
         window.addEventListener('keydown', this._handleKeyDown)
         window.addEventListener('keyup', this._handleKeyUp)
+        console.log('InputManager listeners attached')
     }
 
     startInputLoop() {
-        let sequenceNumber = this.localPlayer.lastProcessedInputSequence > 0 ?
-                            this.localPlayer.lastProcessedInputSequence[this.localPlayer.lastProcessedInputSequence - 1].sequenceNumber + 1 : 0
+        console.log('InputManager input loop started')
+        let sequenceNumber = 0
 
         setInterval(() => {
             const currentInputs = {
@@ -60,32 +61,42 @@ export class InputManager {
                 keyD: this.keys.d.pressed,
                 keySpace: this.keys.space.pressed
             }
-            this.localPlayer.lastProcessedInputSequence.push(currentInputs)
-            this.networkManager.sendPlayerInput(
-                currentInputs,
-                this.localPlayer.gameID,
-                this.localPlayer.playerID
-            )
-        }, 1000 / 60);
+            const predictionResult = this.applyInputToPlayer(this.localPlayer, currentInputs, true)
 
+            if (predictionResult.firedProjectileID) {
+                currentInputs.predictedProjectileID = predictionResult.firedProjectileID
+            }
+
+            this.localPlayer.inputSequence.push(currentInputs)
+            this.networkManager.sendPlayerInput(currentInputs, this.localPlayer)
+        }, 1000 / 60);
+        
     }
 
-    applyInputToPLayer(player, inputState, isPrediction = false) {
+    applyInputToPlayer(player, inputState, isPrediction = false) {
         player.isAccelerating = inputState.keyW
         player.isTurningLeft = inputState.keyA
-        player.isBraking = inputState.keySpace
+        player.isBraking = inputState.keyS
         player.isTurningRight = inputState.keyD
 
+        let firedProjectileID = null
+
         if (isPrediction && inputState.keySpace) {
-            this.projectileManager.tryFireProjectile(player, this.canvas)
+            // console.log(isPrediction, inputState.keySpace)
+            const fireResult = this.projectileManager.tryFireProjectile(player, this.canvas, inputState.sequenceNumber)
+            if (fireResult) {
+                firedProjectileID = fireResult.predictedProjectileID
+            }
+            
         }
+        return { firedProjectileID }
     }
 
     
 
     _handleKeyDown(keyDown) {
         if (!this.localPlayer) return
-
+        // console.log(keyDown)
         switch (keyDown.code) {
             case 'KeyW':           
                 this.keys.w.pressed = true
@@ -101,9 +112,11 @@ export class InputManager {
                 break
             case 'Space':
                 this.keys.space.pressed = true
+                // this.projectileManager.tryFireProjectile(this.localPlayer, this.canvas)
                 break
         }
-        this.applyInputToPLayer(this.localPlayer, this.keys, true)
+        // this.applyInputToPlayer(this.localPlayer, this.keys, true)
+        // console.log('keys (snapshot): ', JSON.parse(JSON.stringify(this.keys)))
     }
 
     _handleKeyUp(keyUp) {
@@ -134,7 +147,7 @@ export class InputManager {
                 this.keys.space.pressed = false
                 break
         }
-        this.applyInputToPLayer(this.localPlayer, this.keys, true)
+        // this.applyInputToPlayer(this.localPlayer, this.keys, true)
     }
 
 

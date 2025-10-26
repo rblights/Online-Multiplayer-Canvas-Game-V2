@@ -1,9 +1,11 @@
 export class GameLoop {
-    constructor(canvas, localPlayer, remotePlayer, projectileManager, backgroundStarManager, foregroundStarManager) {
+    constructor(canvas, localPlayer, remotePlayer, inputManager, projectileManager, backgroundStarManager, foregroundStarManager) {
         this.canvas = canvas
 
         this.localPlayer = localPlayer
         this.remotePlayer = remotePlayer
+
+        this.inputManager = inputManager
 
         this.projectileManager = projectileManager
 
@@ -27,8 +29,15 @@ export class GameLoop {
         this.foregroundStarManager.update()
         this.projectileManager.update()
 
+        const deltaTimeMS = 1000 / this.FPS
+
+        /* if (this.localPlayer && this.inputManager) {
+            this.inputManager.applyInputToPlayer(this.localPlayer, this.inputManager.keys)
+            this.localPlayer.update(deltaTimeMS)
+        } */
+
         if (this.localPlayer) this.localPlayer.update()
-            if (this.remotePlayer) this.remotePlayer.update()
+        if (this.remotePlayer) this.remotePlayer.update()
 
         
     }

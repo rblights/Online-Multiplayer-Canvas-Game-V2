@@ -1,6 +1,7 @@
 import { Canvas } from "./Entities/Canvas.js"
 import { ClientPlayer } from "./Entities/ClientPlayer.js"
 import { InputManager } from "./Managers/InputManager.js"
+import { ClientProjectile } from "./Entities/ClientProjectile.js"
 import { ProjectileManager } from "./Managers/ProjectileManager.js"
 import { BackgroundStarManager } from "./Managers/BackgroundStarManager.js"
 import { ForegroundStarManager } from "./Managers/ForegroundStarManager.js"
@@ -42,15 +43,16 @@ export class GameClient {
             if (initPlayerState.playerID === ourID) {
                 this.localPlayer = new ClientPlayer({...playerState, gameID: gameData.gameID, color: 'blue'})
             } else {
-                this.remotePlayer = new ClientPlayer({...playerState, gameID: gameData.gameID, color: 'red'})
+                this.remotePlayer = new ClientPlayer({...playerState, gameID: gameData.gameID, color: 'red', type: 'Enemy'})
             }
         });
 
+        console.log('Online game started. Local Player: ', this.localPlayer, 'Remote Player: ', this.remotePlayer)
         this._initManagersAndLoop()
         this.gameLoop.start()
         
 
-        console.log('Online game started. Local Player: ', this.localPlayer, 'Remote Player: ', this.remotePlayer)
+        
     }
 
     startSinglePlayerGame(options = {}) {
@@ -66,7 +68,7 @@ export class GameClient {
 
     _initManagersAndLoop() {
         if (this.localPlayer) {
-            console.log('NetworkManager instance before passing to InputManager:', this.networkManager);
+            // console.log('NetworkManager instance before passing to InputManager:', this.networkManager);
             this.inputManager = new InputManager(
                 this.localPlayer,
                 this.projectileManager,
@@ -81,6 +83,7 @@ export class GameClient {
             this.canvas,
             this.localPlayer,
             this.remotePlayer,
+            this.inputManager,
             this.projectileManager,
             this.backgroundStarManager,
             this.foregroundStarManager
@@ -89,25 +92,51 @@ export class GameClient {
     }
 
     handlePlayerStateUpdate(playerStates) {
+
+        const RECONCILIATION_STEP = 1000 / 60
+
         playerStates.forEach(serverPlayerState => {
             if (this.localPlayer && serverPlayerState.playerID === this.localPlayer.playerID) {
                 this.localPlayer.syncState(serverPlayerState)
-                // console.log(this.localPlayer.lastProcessedInputSequence)
-                const lastServerProcessedSequenceNumber = serverPlayerState.lastProcessedInputSequence
-                const lastServerPlayerInputIndex = this.localPlayer.lastProcessedInputSequence.findIndex(input => {
-                    return input.sequenceNumber === lastServerProcessedSequenceNumber
+                // console.log('inputSequence before filter: ',this.localPlayer.inputSequence)
+                // console.log('Server last processed input', serverPlayerState.lastProcessedInputSequence)
+                this.localPlayer.inputSequence = this.localPlayer.inputSequence.filter(input => {
+                    // console.log(input.sequenceNumber)
+                    return input.sequenceNumber > serverPlayerState.lastProcessedInputSequence
                 })
-                if (lastServerPlayerInputIndex !== -1) {
-                    this.localPlayer.lastProcessedInputSequence.splice(0, lastServerPlayerInputIndex + 1)
-                }
-                this.localPlayer.lastProcessedInputSequence.forEach(input => {
+                // console.log('inputSequence after filter: ',this.localPlayer.inputSequence)
+                this.localPlayer.inputSequence.forEach(input => {
                     // console.log(input)
-                    this.inputManager.applyInputToPLayer(this.localPlayer, input, false)
-                    this.localPlayer.update(1000 / 60)
+                    this.inputManager.applyInputToPlayer(this.localPlayer, input, true)
+                    // this.localPlayer.update()
                 })
                 
             } else if (this.remotePlayer && serverPlayerState.playerID === this.remotePlayer.playerID) {
                 this.remotePlayer.syncState(serverPlayerState)
+            }
+        })
+    }
+
+    handleProjectileStateUpdate(serverProjectileData) {
+        // console.log(serverProjectileData)
+        serverProjectileData.forEach(serverProjectile => {
+            const existingProjectile = this.projectileManager.projectiles.find(clientProjectile => {
+                return clientProjectile.projectileID === serverProjectile.projectileID
+            })
+            if (existingProjectile && existingProjectile.playerID === this.localPlayer.playerID) {
+                existingProjectile.color = this.localPlayer.color
+                existingProjectile.syncState(serverProjectile)
+            } else if (existingProjectile && existingProjectile.playerID === this.remotePlayer.playerID) {
+                    existingProjectile.color = this.remotePlayer.color
+                    existingProjectile.syncState(serverProjectile)
+            } else if (!existingProjectile && serverProjectile.playerID === this.localPlayer.playerID) {
+                const localProjectile = new ClientProjectile({...serverProjectile, playerID: this.localPlayer.playerID, color: this.localPlayer.color, canvas: this.canvas})
+                this.projectileManager.projectiles.push(localProjectile)
+                // console.log(localProjectile)
+            } else if (!existingProjectile && serverProjectile.playerID === this.remotePlayer.playerID) {
+                const remoteProjectile = new ClientProjectile({...serverProjectile, playerID: this.remotePlayer.playerID, color: this.remotePlayer.color, canvas: this.canvas})
+                this.projectileManager.projectiles.push(remoteProjectile)
+                console.log(remoteProjectile)
             }
         })
     }

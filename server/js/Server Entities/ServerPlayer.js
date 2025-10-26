@@ -1,4 +1,4 @@
-const { CANVAS, PLAYER_COLORS } = require('../../config/js/gameConfig.js')
+const { CANVAS, PLAYER_COLORS } = require('../../../config/js/gameConfig.js')
 
 class ServerPlayer {
     constructor ({gameID = null, playerID, xPos, yPos, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, projectileSpeed, fireRateDelay}) {
@@ -29,7 +29,7 @@ class ServerPlayer {
         this.fireRateDelay = 500
         this.wasSpacePressedLastTick = false
 
-        this.lastProcessedInputSequence = []
+        this.lastProcessedInputSequence = 0
     }
 
     getState() {
@@ -44,6 +44,7 @@ class ServerPlayer {
             // health: this.health,
             // isAlive: this.isAlive,
             lastProcessedInputSequence: this.lastProcessedInputSequence
+            
         }
     }
 
@@ -81,15 +82,15 @@ class ServerPlayer {
         this.yPos += this.velocity.y
 
         if (this.xPos < 0 - this.radius) {
-            this.xPos = CANVAS.width + this.radius
+            this.xPos += CANVAS.width + 2 * this.radius
         } else if (this.xPos > CANVAS.width + this.radius) {
-            this.xPos = 0 - this.radius
-        }
+            this.xPos -= CANVAS.width + 2 * this.radius
+        } 
 
         if (this.yPos < 0 - this.radius) {
-            this.yPos = CANVAS.height + this.radius
+            this.yPos += CANVAS.height + 2 * this.radius 
         } else if (this.yPos > CANVAS.height + this.radius) {
-            this.yPos = 0 - this.radius
+            this.yPos -= CANVAS.height + 2 * this.radius
         }
 
         if (Date.now() - this.lastFireTime >= this.fireRateDelay) {

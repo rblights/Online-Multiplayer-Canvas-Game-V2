@@ -22,24 +22,25 @@ export class NetworkManager {
             gameClient.handlePlayerStateUpdate(playerStates)
         })
 
-        this.socket.on('projectileFired', (projectileData) => {
-            // gameClient.addRemoteProjectile(projectileData);
-            // console.log("Received projectile fired:", projectileData); // For debugging
+        this.socket.on('projectileStateUpdate', (projectileData) => {
+            // console.log("Received projectile fired:", projectileData)
+            gameClient.handleProjectileStateUpdate(projectileData)
         })
         
     }
 
-    sendPlayerInput(inputData, gameID, playerID) {
-        this.socket.emit('playerInput', inputData, gameID, playerID);
-        //console.log(inputData, gameID)
+    sendPlayerInput(inputData, player) {
+        this.socket.emit('playerInput', inputData, player)
+        // console.log(inputData, player)
     }
 
-    sendProjectileFire(projectileData) {
-        this.socket.emit('fireProjectile', projectileData);
+    sendProjectileFire(predictedProjectileID, projectileData, player) {
+        console.log(projectileData)
+        this.socket.emit('fireProjectile', predictedProjectileID, projectileData, player)
     }
 
     emit(eventName, data) {
-        this.socket.emit(eventName, data);
+        this.socket.emit(eventName, data)
     }
 
     

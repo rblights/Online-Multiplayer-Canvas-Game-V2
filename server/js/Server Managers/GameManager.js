@@ -1,7 +1,8 @@
-const { PLAYERS_PER_GAME } = require('../../config/js/gameConfig.js')
-const { InitPlayerState } = require('./initPlayerState.js')
-const { ServerPlayer } = require('./ServerPlayer.js')
-const { EventEmitter } = require('../../utils/js/EventEmitter.js')
+const { PLAYERS_PER_GAME } = require('../../../config/js/gameConfig.js')
+const { InitPlayerState } = require('../initPlayerState.js')
+const { ServerPlayer } = require('../Server Entities/ServerPlayer.js')
+const { EventEmitter } = require('../../../utils/js/EventEmitter.js')
+const { ServerProjectileManager } = require('./ServerProjectileManager.js')
 
 class GameManager extends EventEmitter {
     constructor() {
@@ -47,7 +48,7 @@ class GameManager extends EventEmitter {
                 ...state2,
                 gameID: gameID
             })
-            console.log('ServerPlayer1: ', serverPlayer2)
+            console.log('ServerPlayer2: ', serverPlayer2)
 
             this.activeGames[gameID] = {
                 players: {
@@ -57,8 +58,10 @@ class GameManager extends EventEmitter {
                 sockets: {
                     [player1.id]: player1.socket,
                     [player2.id]: player2.socket
-                }
+                },
+                serverProjectileManager: new ServerProjectileManager()
             }
+            
             this.startOrUpdateGameLoops(gameID)
             console.log(`Starting new game ${gameID} with ${player1.id} and ${player2.id}`)
 
@@ -68,6 +71,15 @@ class GameManager extends EventEmitter {
                 player2,
                 serverPlayers: [serverPlayer1, serverPlayer2]
             }
+        }
+        return null
+    }
+
+    addGameProjectile(projectileData) {
+        const game = this.activeGames[projectileData.gameID] 
+        if (game && game.serverProjectileManager) {
+            // console.log('projData in gameManager: ', projectileData)
+            return game.serverProjectileManager.addServerProjectile(projectileData)
         }
         return null
     }
@@ -90,13 +102,36 @@ class GameManager extends EventEmitter {
             playersToUpdate.forEach(serverPlayer => {
                 serverPlayer.update()
                 updatedPlayerStates.push(serverPlayer.getState())
+                // console.log(serverPlayer.getState().lastProcessedInputSequence)
             })
 
+            const serverProjectileManager = this.activeGames[gameID].serverProjectileManager
+
+            serverProjectileManager.update()
+            
+
+            setTimeout(() => {
             this.emit('playerStateUpdate', gameID, updatedPlayerStates)
+            this.emit('projectileStateUpdate', gameID, serverProjectileManager.getStates())
+            
+            }, 100);
 
-        }, 1000 / 60)
+        }, 1000 / 60 )
 
 
+    }
+
+    endGame(gameID) {
+        if (this.gameLoops[gameID]) {
+            clearInterval(this.gameLoops[gameID])
+            delete this.gameLoops[gameID]
+            console.log(`Stopped game loop for ${gameID}`)
+        }
+
+        if (this.activeGames[gameID]) {
+            delete this.activeGames[gameID]
+            console.log(`Game ${gameID} officially ended and removed.`)
+        }
     }
 
 
