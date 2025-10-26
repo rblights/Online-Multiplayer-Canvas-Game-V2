@@ -75,11 +75,11 @@ class GameManager extends EventEmitter {
         return null
     }
 
-    addGameProjectile(projectileData) {
-        const game = this.activeGames[projectileData.gameID] 
+    addGameProjectile(player, projectileID) {
+        const game = this.activeGames[player.gameID] 
         if (game && game.serverProjectileManager) {
             // console.log('projData in gameManager: ', projectileData)
-            return game.serverProjectileManager.addServerProjectile(projectileData)
+            return game.serverProjectileManager.addServerProjectile(player, projectileID)
         }
         return null
     }
@@ -114,7 +114,7 @@ class GameManager extends EventEmitter {
             this.emit('playerStateUpdate', gameID, updatedPlayerStates)
             this.emit('projectileStateUpdate', gameID, serverProjectileManager.getStates())
             
-            }, 100);
+            }, 10);
 
         }, 1000 / 60 )
 

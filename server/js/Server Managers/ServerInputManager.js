@@ -34,32 +34,10 @@ class ServerInputManager {
         player.isBraking = currentInputs.keyS
         player.isTurningRight = currentInputs.keyD
 
-        if (currentInputs.keySpace && Date.now() - player.lastFireTime >= player.fireRateDelay) {
-            player.wasSpacePressedLastTick = true
-            const projectileData = {
-                gameID: player.gameID,
-                playerID: player.playerID,
-                projectileID: currentInputs.predictedProjectileID,
-                x: player.xPos + (4 / 3) * player.radius * Math.cos(player.angle),
-                y: player.yPos - (4 / 3) * player.radius * Math.sin(player.angle),
-                radius: 3,
-                color: player.color,
-                velocity: {x: Math.cos(player.angle), y: -Math.sin(player.angle)},
-                projectileSpeed: player.projectileSpeed
-            }
-            // console.log(player)
-            // console.log(projectileData)
-            this.gameManager.addGameProjectile(projectileData)
-            player.lastFireTime = Date.now()
-            
-            
+        if (currentInputs.keySpace && currentInputs.predictedProjectileID) {
+            this.gameManager.addGameProjectile(player, currentInputs.predictedProjectileID)
+            console.log(currentInputs)
         }
-
-        if (!currentInputs.keySpace) {
-            player.wasSpacePressedLastTick = false;
-        }
-        
-
         
         player.lastProcessedInputSequence = currentInputs.sequenceNumber
         // console.log(player.lastProcessedInputSequence)

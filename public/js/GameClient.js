@@ -119,13 +119,17 @@ export class GameClient {
 
     handleProjectileStateUpdate(serverProjectileData) {
         // console.log(serverProjectileData)
+        const validatedIDs = new Set()
+        
         serverProjectileData.forEach(serverProjectile => {
+            validatedIDs.add(serverProjectile.projectileID)
             const existingProjectile = this.projectileManager.projectiles.find(clientProjectile => {
                 return clientProjectile.projectileID === serverProjectile.projectileID
             })
             if (existingProjectile && existingProjectile.playerID === this.localPlayer.playerID) {
                 existingProjectile.color = this.localPlayer.color
                 existingProjectile.syncState(serverProjectile)
+                // console.log(existingProjectile)
             } else if (existingProjectile && existingProjectile.playerID === this.remotePlayer.playerID) {
                     existingProjectile.color = this.remotePlayer.color
                     existingProjectile.syncState(serverProjectile)
@@ -136,8 +140,13 @@ export class GameClient {
             } else if (!existingProjectile && serverProjectile.playerID === this.remotePlayer.playerID) {
                 const remoteProjectile = new ClientProjectile({...serverProjectile, playerID: this.remotePlayer.playerID, color: this.remotePlayer.color, canvas: this.canvas})
                 this.projectileManager.projectiles.push(remoteProjectile)
-                console.log(remoteProjectile)
+                // console.log(remoteProjectile)
             }
+
+        
+        })
+        this.projectileManager.projectiles = this.projectileManager.projectiles.filter(clientProjectile => {
+            return validatedIDs.has(clientProjectile.projectileID)
         })
     }
 }

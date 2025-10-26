@@ -27,7 +27,8 @@ export class ClientPlayer {
         this.type = null
         this.projectileSpeed = projectileSpeed
         this.lastFireTime = Date.now()
-        this.fireRateDelay = 500
+        this.fireRateDelay = 100
+        this.serverFireRateDelay = 500
 
         this.inputSequence = []
 
@@ -154,7 +155,7 @@ export class ClientPlayer {
             
         }
 
-        if (Date.now() - this.lastFireTime >= this.fireRateDelay) {
+        if (Date.now() - this.lastFireTime >= this.serverFireRateDelay) {
             this.thrusterColor = 'lightGreen'
         } else {
             this.thrusterColor = 'white'
