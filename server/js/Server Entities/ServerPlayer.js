@@ -48,6 +48,23 @@ class ServerPlayer {
         }
     }
 
+    getVertices() {
+        const POINT1_X = this.x + 4 / 3 * this.radius * Math.cos(this.angle)
+        const POINT1_Y = this.y - 4 / 3 * this.radius * Math.sin(this.angle)
+
+        const POINT2_X = this.x - this.radius * (2 / 3 * Math.cos(this.angle) + Math.sin(this.angle))
+        const POINT2_Y = this.y + this.radius * (2 / 3 * Math.sin(this.angle) - Math.cos(this.angle))
+
+        const POINT3_X = this.x - this.radius * (2 / 3 * Math.cos(this.angle) - Math.sin(this.angle))
+        const POINT3_Y = this.y + this.radius * (2 / 3 * Math.sin(this.angle) + Math.cos(this.angle))
+
+        return [
+            { x: POINT1_X, y: POINT1_Y },
+            { x: POINT2_X, y: POINT2_Y },
+            { x: POINT3_X, y: POINT3_Y }
+        ]
+    }
+
     update() {
         //console.log(`--- Updating Player ${this.playerID} ---`);
         //console.log(`Before update: x=${this.x}, y=${this.y}, velocity.x=${this.velocity.x}, velocity.y=${this.velocity.y}, isAccelerating=${this.isAccelerating}`);
