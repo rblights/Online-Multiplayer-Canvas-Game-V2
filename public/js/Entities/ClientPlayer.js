@@ -1,11 +1,11 @@
 export class ClientPlayer {
-    constructor ({gameID = null, playerID, xPos, yPos, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, type = null, projectileSpeed, fireRateDelay, canvas}) {
+    constructor ({gameID = null, playerID, x, y, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, type = null, projectileSpeed, fireRateDelay, canvas}) {
         this.gameID = gameID
         this.playerID = playerID
-        this.xPos = xPos
-        this.yPos = yPos
-        this.authoritativeXPos = null
-        this.authoritativeYPos = null
+        this.x = x
+        this.y = y
+        this.authoritativeX = null
+        this.authoritativeY = null
         this.lerpFactor = .2
         this.radius = radius
         this.color = color
@@ -36,10 +36,10 @@ export class ClientPlayer {
     }
 
     syncState(newState) {
-        // if (newState.xPos !== undefined) this.authoritativeXPos = newState.xPos
-        // if (newState.yPos !== undefined) this.authoritativeYPos = newState.yPos
-        if (newState.xPos !== undefined) this.xPos = newState.xPos
-        if (newState.yPos !== undefined) this.yPos = newState.yPos
+        // if (newState.x !== undefined) this.authoritativeX = newState.x
+        // if (newState.y !== undefined) this.authoritativeY = newState.y
+        if (newState.x !== undefined) this.x = newState.x
+        if (newState.y !== undefined) this.y = newState.y
         if (newState.angle !== undefined) this.angle = newState.angle
         if (newState.rotation !== undefined) this.rotation = newState.rotation
         if (newState.velocity !== undefined) this.velocity = newState.velocity
@@ -52,14 +52,14 @@ export class ClientPlayer {
         this.canvas.context.lineWidth = 5
 
         const drawShip = (centerX, centerY) => {
-            const POINT1_X = this.xPos + 4 / 3 * this.radius * Math.cos(this.angle)
-            const POINT1_Y = this.yPos - 4 / 3 * this.radius * Math.sin(this.angle)
+            const POINT1_X = this.x + 4 / 3 * this.radius * Math.cos(this.angle)
+            const POINT1_Y = this.y - 4 / 3 * this.radius * Math.sin(this.angle)
 
-            const POINT2_X = this.xPos - this.radius * (2 / 3 * Math.cos(this.angle) + Math.sin(this.angle))
-            const POINT2_Y = this.yPos + this.radius * (2 / 3 * Math.sin(this.angle) - Math.cos(this.angle))
+            const POINT2_X = this.x - this.radius * (2 / 3 * Math.cos(this.angle) + Math.sin(this.angle))
+            const POINT2_Y = this.y + this.radius * (2 / 3 * Math.sin(this.angle) - Math.cos(this.angle))
 
-            const POINT3_X = this.xPos - this.radius * (2 / 3 * Math.cos(this.angle) - Math.sin(this.angle))
-            const POINT3_Y = this.yPos + this.radius * (2 / 3 * Math.sin(this.angle) + Math.cos(this.angle))
+            const POINT3_X = this.x - this.radius * (2 / 3 * Math.cos(this.angle) - Math.sin(this.angle))
+            const POINT3_Y = this.y + this.radius * (2 / 3 * Math.sin(this.angle) + Math.cos(this.angle))
 
             this.canvas.context.beginPath()
             this.canvas.context.moveTo(POINT1_X, POINT1_Y)
@@ -82,36 +82,36 @@ export class ClientPlayer {
 
         
 
-        drawShip(this.xPos, this.yPos)
+        drawShip(this.x, this.y)
 
-        if (this.xPos < this.radius) {
-            drawShip(this.xPos + this.canvas.canvas.width, this.yPos)
-        } else if (this.xPos > this.canvas.canvas.width - this.radius) {
-            drawShip(this.xPos - this.canvas.canvas.width, this.yPos)
+        if (this.x < this.radius) {
+            drawShip(this.x + this.canvas.canvas.width, this.y)
+        } else if (this.x > this.canvas.canvas.width - this.radius) {
+            drawShip(this.x - this.canvas.canvas.width, this.y)
         }
 
-        if (this.yPos < this.radius) {
-            drawShip(this.xPos, this.yPos + this.canvas.canvas.height)
-        } else if (this.yPos > this.canvas.canvas.height - this.radius) {
-            drawShip(this.xPos, this.yPos - this.canvas.canvas.width)
+        if (this.y < this.radius) {
+            drawShip(this.x, this.y + this.canvas.canvas.height)
+        } else if (this.y > this.canvas.canvas.height - this.radius) {
+            drawShip(this.x, this.y - this.canvas.canvas.width)
         }
 
-        if (this.xPos < this.radius && this.yPos < this.radius) {
-            drawShip(this.xPos + this.canvas.canvas.width, this.yPos + this.canvas.canvas.height)
-        } else if (this.xPos > this.canvas.canvas.width - this.radius && this.yPos < this.radius) {
-            drawShip(this.xPos - this.canvas.canvas.width, this.yPos + this.canvas.canvas.height)
-        } else if (this.xPos < this.radius && this.yPos > this.canvas.canvas.height - this.radius) {
-            drawShip(this.xPos + this.canvas.canvas.width, this.yPos - this.canvas.canvas.height) 
-        } else if (this.xPos > this.canvas.canvas.width - this.radius && this.yPos > this.canvas.canvas.height - this.radius) {
-            drawShip(this.xPos - this.canvas.canvas.width, this.yPos - this.canvas.canvas.height)
+        if (this.x < this.radius && this.y < this.radius) {
+            drawShip(this.x + this.canvas.canvas.width, this.y + this.canvas.canvas.height)
+        } else if (this.x > this.canvas.canvas.width - this.radius && this.y < this.radius) {
+            drawShip(this.x - this.canvas.canvas.width, this.y + this.canvas.canvas.height)
+        } else if (this.x < this.radius && this.y > this.canvas.canvas.height - this.radius) {
+            drawShip(this.x + this.canvas.canvas.width, this.y - this.canvas.canvas.height) 
+        } else if (this.x > this.canvas.canvas.width - this.radius && this.y > this.canvas.canvas.height - this.radius) {
+            drawShip(this.x - this.canvas.canvas.width, this.y - this.canvas.canvas.height)
         }
         
     }
 
     update() {
 
-        // this.xPos = this.xPos + (this.authoritativeXPos - this.xPos) * this.lerpFactor
-        // this.yPos = this.yPos + (this.authoritativeYPos - this.yPos) * this.lerpFactor
+        // this.x = this.x + (this.authoritativeX - this.x) * this.lerpFactor
+        // this.y = this.y + (this.authoritativeY - this.y) * this.lerpFactor
 
         this.angle += this.rotation;
 
@@ -139,19 +139,19 @@ export class ClientPlayer {
             this.rotation = 0
         }
 
-        this.xPos += this.velocity.x
-        this.yPos += this.velocity.y
+        this.x += this.velocity.x
+        this.y += this.velocity.y
 
-        if (this.xPos < 0 - this.radius) {
-            this.xPos += this.canvas.canvas.width + 2 * this.radius
-        } else if (this.xPos > this.canvas.canvas.width + this.radius) {
-            this.xPos -= this.canvas.canvas.width + 2 * this.radius
+        if (this.x < 0 - this.radius) {
+            this.x += this.canvas.canvas.width + 2 * this.radius
+        } else if (this.x > this.canvas.canvas.width + this.radius) {
+            this.x -= this.canvas.canvas.width + 2 * this.radius
         } 
 
-        if (this.yPos < 0 - this.radius) {
-            this.yPos += this.canvas.canvas.height + 2 * this.radius 
-        } else if (this.yPos > this.canvas.canvas.height + this.radius) {
-            this.yPos -= this.canvas.canvas.height + 2 * this.radius
+        if (this.y < 0 - this.radius) {
+            this.y += this.canvas.canvas.height + 2 * this.radius 
+        } else if (this.y > this.canvas.canvas.height + this.radius) {
+            this.y -= this.canvas.canvas.height + 2 * this.radius
             
         }
 

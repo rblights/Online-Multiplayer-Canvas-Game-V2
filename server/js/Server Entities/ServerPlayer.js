@@ -1,11 +1,11 @@
 const { CANVAS, PLAYER_COLORS } = require('../../../config/js/gameConfig.js')
 
 class ServerPlayer {
-    constructor ({gameID = null, playerID, xPos, yPos, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, projectileSpeed, fireRateDelay}) {
+    constructor ({gameID = null, playerID, x, y, radius, color, thrusterColor, angle, turnSpeed, acceleration, maxSpeed, velocityDampening, velocityDampeningBrake, projectileSpeed, fireRateDelay}) {
         this.gameID = gameID
         this.playerID = playerID
-        this.xPos = xPos
-        this.yPos = yPos
+        this.x = x
+        this.y = y
         this.radius = radius
         this.color = color
         this.thrusterColor = thrusterColor
@@ -35,8 +35,8 @@ class ServerPlayer {
     getState() {
         return {
             playerID: this.playerID,
-            xPos: this.xPos,
-            yPos: this.yPos,
+            x: this.x,
+            y: this.y,
             angle: this.angle, 
             velocity: { ...this.velocity }, 
             color: this.color,
@@ -50,7 +50,7 @@ class ServerPlayer {
 
     update() {
         //console.log(`--- Updating Player ${this.playerID} ---`);
-        //console.log(`Before update: xPos=${this.xPos}, yPos=${this.yPos}, velocity.x=${this.velocity.x}, velocity.y=${this.velocity.y}, isAccelerating=${this.isAccelerating}`);
+        //console.log(`Before update: x=${this.x}, y=${this.y}, velocity.x=${this.velocity.x}, velocity.y=${this.velocity.y}, isAccelerating=${this.isAccelerating}`);
 
         this.angle += this.rotation;
 
@@ -78,19 +78,19 @@ class ServerPlayer {
             this.rotation = 0
         }
 
-        this.xPos += this.velocity.x
-        this.yPos += this.velocity.y
+        this.x += this.velocity.x
+        this.y += this.velocity.y
 
-        if (this.xPos < 0 - this.radius) {
-            this.xPos += CANVAS.width + 2 * this.radius
-        } else if (this.xPos > CANVAS.width + this.radius) {
-            this.xPos -= CANVAS.width + 2 * this.radius
+        if (this.x < 0 - this.radius) {
+            this.x += CANVAS.width + 2 * this.radius
+        } else if (this.x > CANVAS.width + this.radius) {
+            this.x -= CANVAS.width + 2 * this.radius
         } 
 
-        if (this.yPos < 0 - this.radius) {
-            this.yPos += CANVAS.height + 2 * this.radius 
-        } else if (this.yPos > CANVAS.height + this.radius) {
-            this.yPos -= CANVAS.height + 2 * this.radius
+        if (this.y < 0 - this.radius) {
+            this.y += CANVAS.height + 2 * this.radius 
+        } else if (this.y > CANVAS.height + this.radius) {
+            this.y -= CANVAS.height + 2 * this.radius
         }
 
         if (Date.now() - this.lastFireTime >= this.fireRateDelay) {

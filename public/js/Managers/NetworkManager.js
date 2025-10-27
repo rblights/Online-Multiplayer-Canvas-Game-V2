@@ -35,7 +35,7 @@ export class NetworkManager {
     }
 
     sendProjectileFire(predictedProjectileID, projectileData, player) {
-        console.log(projectileData)
+        // console.log(projectileData)
         this.socket.emit('fireProjectile', predictedProjectileID, projectileData, player)
     }
 

@@ -14,8 +14,8 @@ class ServerProjectileManager {
             gameID: player.gameID,
                 playerID: player.playerID,
                 projectileID: projectileID,
-                x: player.xPos + (4 / 3) * player.radius * Math.cos(player.angle),
-                y: player.yPos - (4 / 3) * player.radius * Math.sin(player.angle),
+                x: player.x + (4 / 3) * player.radius * Math.cos(player.angle),
+                y: player.y - (4 / 3) * player.radius * Math.sin(player.angle),
                 radius: 3,
                 color: player.color,
                 velocity: {x: Math.cos(player.angle), y: -Math.sin(player.angle)},
@@ -23,7 +23,7 @@ class ServerProjectileManager {
             })
             this.serverProjectiles.push(serverProjectile)
             player.lastFireTime = Date.now()
-            console.log('proj in projManager: ', serverProjectile)
+            // console.log('proj in projManager: ', serverProjectile)
             return serverProjectile
 
         }

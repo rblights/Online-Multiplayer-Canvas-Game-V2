@@ -3,6 +3,7 @@ const { InitPlayerState } = require('../initPlayerState.js')
 const { ServerPlayer } = require('../Server Entities/ServerPlayer.js')
 const { EventEmitter } = require('../../../utils/js/EventEmitter.js')
 const { ServerProjectileManager } = require('./ServerProjectileManager.js')
+const { ServerCollisionManager } = require('../Server Managers/ServerCollisionManager.js')
 
 class GameManager extends EventEmitter {
     constructor() {
@@ -59,7 +60,8 @@ class GameManager extends EventEmitter {
                     [player1.id]: player1.socket,
                     [player2.id]: player2.socket
                 },
-                serverProjectileManager: new ServerProjectileManager()
+                serverProjectileManager: new ServerProjectileManager(),
+                serverCollisionManager: new ServerCollisionManager(20)
             }
             
             this.startOrUpdateGameLoops(gameID)
@@ -104,10 +106,17 @@ class GameManager extends EventEmitter {
                 updatedPlayerStates.push(serverPlayer.getState())
                 // console.log(serverPlayer.getState().lastProcessedInputSequence)
             })
+            // console.log(updatedPlayerStates)
 
             const serverProjectileManager = this.activeGames[gameID].serverProjectileManager
+            const serverCollisionManager = this.activeGames[gameID].serverCollisionManager
 
-            serverProjectileManager.update()
+            serverCollisionManager.checkCollisions(playersToUpdate, serverProjectileManager.serverProjectiles)
+
+            const updatedProjectileStates = serverProjectileManager.update()
+            // console.log(updatedProjectileStates)
+
+            
             
 
             setTimeout(() => {

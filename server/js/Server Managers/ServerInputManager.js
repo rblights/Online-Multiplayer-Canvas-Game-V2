@@ -36,7 +36,7 @@ class ServerInputManager {
 
         if (currentInputs.keySpace && currentInputs.predictedProjectileID) {
             this.gameManager.addGameProjectile(player, currentInputs.predictedProjectileID)
-            console.log(currentInputs)
+            // console.log(currentInputs)
         }
         
         player.lastProcessedInputSequence = currentInputs.sequenceNumber

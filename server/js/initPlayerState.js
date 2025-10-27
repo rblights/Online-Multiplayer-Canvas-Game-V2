@@ -5,8 +5,8 @@ function InitPlayerState(id, role) {
     
     return {
         playerID: id,
-        xPos: isP1? 320 : CANVAS.width - 320,
-        yPos: CANVAS.height / 2,
+        x: isP1? 320 : CANVAS.width - 320,
+        y: CANVAS.height / 2,
         angle: isP1? 90 : 270,
         ...BASE_PLAYER_STATS,
         ...PLAYER_COLORS
