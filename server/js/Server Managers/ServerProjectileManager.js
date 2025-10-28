@@ -2,7 +2,7 @@ const { ServerProjectile } = require('../Server Entities/ServerProjectile.js')
 
 class ServerProjectileManager {
     constructor() {
-        this.serverProjectiles = []
+        this.serverProjectiles = new Map()
         this.nextProjectileID = 1
         
     }
@@ -21,7 +21,7 @@ class ServerProjectileManager {
                 velocity: {x: Math.cos(player.angle), y: -Math.sin(player.angle)},
                 projectileSpeed: player.projectileSpeed
             })
-            this.serverProjectiles.push(serverProjectile)
+            this.serverProjectiles.set(serverProjectile.projectileID, serverProjectile)
             player.lastFireTime = Date.now()
             // console.log('proj in projManager: ', serverProjectile)
             return serverProjectile
@@ -32,17 +32,32 @@ class ServerProjectileManager {
         
     }
 
+    deleteServerProjectile(projectileID) {
+        if (this.serverProjectiles.has(projectileID)) {
+            this.serverProjectiles.delete(projectileID)
+        }
+    }
+
     update() {
-        this.serverProjectiles = this.serverProjectiles.map(p => {
-            p.update()
-            return p
-        })
-        this.serverProjectiles = this.serverProjectiles.filter(p => p.alpha > 0.75)
+        const updatedProjectiles = new Map()
+
+        for (const [projectileID, projectile] of this.serverProjectiles.entries()) {
+            projectile.update()
+
+            if (projectile.alpha > 0.75) {
+                updatedProjectiles.set(projectileID, projectile)
+            } 
+        }
+        this.serverProjectiles = updatedProjectiles
         return this.serverProjectiles
     }
 
+    getProjectiles() {
+        return [...this.serverProjectiles.values()]
+    }
+
     getStates() {
-        return this.serverProjectiles.map(p => p.getState()) 
+        return [...this.serverProjectiles.values()].map(p => p.getState())
     }
 }
 

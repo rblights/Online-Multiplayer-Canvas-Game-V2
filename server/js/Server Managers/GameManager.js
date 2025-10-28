@@ -51,6 +51,8 @@ class GameManager extends EventEmitter {
             })
             console.log('ServerPlayer2: ', serverPlayer2)
 
+            const serverProjectileManager = new ServerProjectileManager()
+
             this.activeGames[gameID] = {
                 players: {
                     [player1.id]: serverPlayer1,
@@ -60,8 +62,8 @@ class GameManager extends EventEmitter {
                     [player1.id]: player1.socket,
                     [player2.id]: player2.socket
                 },
-                serverProjectileManager: new ServerProjectileManager(),
-                serverCollisionManager: new ServerCollisionManager(20)
+                serverProjectileManager: serverProjectileManager,
+                serverCollisionManager: new ServerCollisionManager(20, serverProjectileManager)
             }
             
             this.startOrUpdateGameLoops(gameID)
@@ -111,13 +113,11 @@ class GameManager extends EventEmitter {
             const serverProjectileManager = this.activeGames[gameID].serverProjectileManager
             const serverCollisionManager = this.activeGames[gameID].serverCollisionManager
 
-            serverCollisionManager.checkCollisions(playersToUpdate, serverProjectileManager.serverProjectiles)
-
             const updatedProjectileStates = serverProjectileManager.update()
             // console.log(updatedProjectileStates)
 
-            
-            
+            serverCollisionManager.checkCollisions(playersToUpdate, serverProjectileManager.getProjectiles())
+            // console.log(serverProjectileManager.getStates())
 
             setTimeout(() => {
             this.emit('playerStateUpdate', gameID, updatedPlayerStates)

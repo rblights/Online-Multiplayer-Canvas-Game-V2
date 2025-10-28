@@ -3,9 +3,10 @@ const { ServerPlayer } = require('../Server Entities/ServerPlayer.js')
 const { ServerProjectile } = require('../Server Entities/ServerProjectile.js')
 
 class ServerCollisionManager {
-    constructor(gridSize) {
+    constructor(gridSize, serverProjectileManager) {
         this.gridSize = gridSize
         this.grid = {}
+        this.serverProjectileManager = serverProjectileManager
     }
 
     getGridKey(x, y) {
@@ -71,6 +72,7 @@ class ServerCollisionManager {
 
         if (this.checkCircleTriangleCollision(projectile, playerVertices)) {
             console.log(`Player ${player.playerID} hit by projectile from Player ${projectile.playerID}`)
+            this.serverProjectileManager.deleteServerProjectile(projectile.projectileID)
         }
 
     }
