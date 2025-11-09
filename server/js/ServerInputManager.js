@@ -1,5 +1,3 @@
-const { ServerProjectile } = require("../Server Entities/ServerProjectile.js")
-
 class ServerInputManager {
     constructor(inputEmitter, gameManager, playerID) {
         this.inputEmitter = inputEmitter
@@ -47,7 +45,7 @@ class ServerInputManager {
     handleDisconnect(data) {
         const { reason } = data
         console.log(`User ${this.playerID} disconnected. Reason: ${reason}`)
-        this.gameManager.removePlayerFromQueue(this.playerID)
+        // this.gameManager.removePlayerFromQueue(this.playerID)
         // this.gameManager.handleGamePlayerLeave(this.playerID)
     }
 }

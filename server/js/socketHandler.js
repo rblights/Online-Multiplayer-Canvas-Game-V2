@@ -1,6 +1,6 @@
 const { CANVAS } = require('../../config/js/gameConfig.js')
 const { EventEmitter } = require('../../utils/js/EventEmitter.js')
-const { ServerInputManager } = require('./Server Managers/ServerInputManager.js')
+const { ServerInputManager } = require('./ServerInputManager.js')
 
 function initSocketEvents(io, gameManager) {
 
@@ -33,29 +33,30 @@ function initSocketEvents(io, gameManager) {
         const matchData = gameManager.checkForMatch()
 
         if (matchData) {
-            const { gameID, player1, player2, serverPlayers } = matchData
+            const { gameID, queuedPlayer1, queuedPlayer2, serverPlayers } = matchData
 
-            player1.socket.join(gameID)
-            player2.socket.join(gameID)
+            queuedPlayer1.socket.join(gameID)
+            queuedPlayer2.socket.join(gameID)
 
-            player1.socket.gameID = gameID
-            player2.socket.gameID = gameID
+            queuedPlayer1.socket.gameID = gameID
+            queuedPlayer2.socket.gameID = gameID
 
-            player1.socket.emit('gameStart', {
+            const playerStates = serverPlayers.map(p => p.getState())
+
+            queuedPlayer1.socket.emit('gameStart', {
                 gameID: gameID,
-                playerID: player1.id,
+                playerID: queuedPlayer1.id,
                 role: 'P1',
-                players: serverPlayers,  //serverPlayers.map(p => p.getState())
+                players: serverPlayers, 
                 canvas: CANVAS
             })
-            player2.socket.emit('gameStart', {
+            queuedPlayer2.socket.emit('gameStart', {
                 gameID: gameID,
-                playerID: player2.id,
+                playerID: queuedPlayer2.id,
                 role: 'P2',
                 players: serverPlayers,
                 canvas: CANVAS
             })
-            gameManager.startOrUpdateGameLoops(gameID)
         }
 
         socket.on('disconnect', (reason) => {
@@ -67,9 +68,9 @@ function initSocketEvents(io, gameManager) {
 
             const disconnectedGameID = socket.gameID; 
 
-            if (disconnectedGameID && gameManager.endGame(disconnectedGameID)) {
+           /* if (disconnectedGameID && gameManager.endGame(disconnectedGameID)) {
                 console.log(`Removed ${socket.id} and ended game ${disconnectedGameID}.`)
-            }
+            } */
         })
     })
 }

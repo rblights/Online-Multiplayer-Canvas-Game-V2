@@ -34,7 +34,7 @@ class ServerProjectile {
         this.x += this.velocity.x * this.projectileSpeed
         this.y += this.velocity.y * this.projectileSpeed
 
-        this.alpha -= .002
+        this.alpha -= .003
 
         // console.log(this.CANVAS.width)
 

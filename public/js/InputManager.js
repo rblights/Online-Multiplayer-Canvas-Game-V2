@@ -1,4 +1,4 @@
-import { ClientProjectile } from "../Entities/ClientProjectile.js"
+import { ClientProjectile } from "./Entities/ClientProjectile.js"
 
 export class InputManager {
     constructor(localPlayer, projectileManager, canvas, networkManager = null) {

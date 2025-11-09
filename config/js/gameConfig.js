@@ -15,12 +15,12 @@ const PLAYER_COLORS = {
 
 const BASE_PLAYER_STATS = {
     radius: 10,
-    turnSpeed: 270,
-    acceleration: .15,
+    turnSpeed: 180,
+    acceleration: .10,
     maxSpeed: 2,
     velocityDampening: .99,
     velocityDampeningBrake: .95,
-    projectileSpeed: 10,
+    projectileSpeed: 15,
     fireRateDelay: 500,
     health: 100,
     score: 0

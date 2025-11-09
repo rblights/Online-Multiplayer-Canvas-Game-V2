@@ -1,12 +1,12 @@
 import { Canvas } from "./Entities/Canvas.js"
 import { ClientPlayer } from "./Entities/ClientPlayer.js"
-import { InputManager } from "./Managers/InputManager.js"
+import { InputManager } from "./InputManager.js"
 import { ClientProjectile } from "./Entities/ClientProjectile.js"
-import { ProjectileManager } from "./Managers/ProjectileManager.js"
-import { BackgroundStarManager } from "./Managers/BackgroundStarManager.js"
-import { ForegroundStarManager } from "./Managers/ForegroundStarManager.js"
+import { ProjectileManager } from "./Entity Managers/ProjectileManager.js"
+import { BackgroundStarManager } from "./Entity Managers/BackgroundStarManager.js"
+import { ForegroundStarManager } from "./Entity Managers/ForegroundStarManager.js"
 import { GameLoop } from "./GameLoop.js"
-import { NetworkManager } from "./Managers/NetworkManager.js"
+import { NetworkManager } from "./NetworkManager.js"
 
 export class GameClient {
     constructor(socket = null, networkManager = null) {
